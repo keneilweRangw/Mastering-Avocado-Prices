@@ -1,6 +1,8 @@
 
 # Navigating Avocado Pricing: "A Strategic Approach to Regional, Seasonal, and Predictive Insights"
-![Navigating Avocado Pricing](https://th.bing.com/th?id=OSK.HEROaePFcJLP6NaSP0ZRnHOcfsfFekcrq236K7X3Qz-k8ik&w=472&h=280&c=1&rs=2&o=6&dpr=1.3&pid=SANGAM)
+<p align="center">
+  <img src="https://th.bing.com/th?id=OSK.HEROaePFcJLP6NaSP0ZRnHOcfsfFekcrq236K7X3Qz-k8ik&w=472&h=280&c=1&rs=2&o=6&dpr=1.3&pid=SANGAM" alt="Navigating Avocado Pricing" width="600">
+</p>
 
 Introduction:
 
