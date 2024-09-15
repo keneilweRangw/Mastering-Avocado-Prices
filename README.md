@@ -1,6 +1,6 @@
 
 # Navigating Avocado Pricing: "A Strategic Approach to Regional, Seasonal, and Predictive Insights"
-![Navigating Avocado Pricing](images/qor2.png)
+![Navigating Avocado Pricing](images/qor2.jpeg)
 
 
 Introduction:
