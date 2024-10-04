@@ -12,5 +12,5 @@ This project, “Navigating Avocado Pricing: A Strategic Approach to Regional, S
 
 ### Problem Statement:
 
-“Effectively managing avocado pricing requires an in-depth understanding of the multifaceted factors that drive market dynamics. From regional variations to seasonal trends and predictive modeling, each element plays a crucial role in determining the final price of avocados. This project seeks to uncover these influences by analyzing data from 2015 to 2023, focusing on how geography, seasonality, and economic events shape avocado prices and sales volumes. The insights gained will empower stakeholders to craft more informed and strategic pricing decisions, ultimately optimizing the supply chain and ensuring sustained market success.”
+Effectively managing avocado pricing requires a comprehensive understanding of the various factors that drive market dynamics. Regional variations, seasonal trends, and predictive modeling all play vital roles in determining the final price of avocados. This project aims to analyze data from 2015 to 2023 to uncover how geography, seasonality, and economic events influence avocado prices and sales volumes. The insights gained from this analysis will empower stakeholders to make informed and strategic pricing decisions, ultimately optimizing the supply chain and ensuring sustained success in the market.
 
