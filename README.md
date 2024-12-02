@@ -77,6 +77,8 @@ python main.py
 
 Explore Results: After running the code, explore the generated results, including visualizations and analysis reports, to gain insights into Avocado pricing trends.
 
+### For more analysis, have a look at the **REPORT DASHBOARD** that consists of more informative charts
+
 Thank you for your interest in the Mastering-Avocado-Prices project!I hope you find it informative and useful. Happy analyzing!
 
 Keneilwe Rangwaga | (patricia001105@gmail.com)
