@@ -53,13 +53,75 @@ if page == "Historical Patterns":
                  title="Average Price by Region",
                  labels={'x': 'Region', 'y': 'Average Price'})
     st.plotly_chart(fig)
+# Seasonal Trends
+    st.subheader(f"Seasonal Trends in {region}")
+    region_data['Month'] = region_data['Date'].dt.month
+    monthly_avg_price = region_data.groupby('Month')['AveragePrice'].mean().reset_index()
+    monthly_chart = alt.Chart(monthly_avg_price).mark_line(point=True).encode(
+        x=alt.X('Month:O', title='Month'),
+        y=alt.Y('AveragePrice:Q', title='Average Price'),
+        tooltip=['Month', 'AveragePrice']
+    ).properties(
+        title=f"Seasonal Price Trends in {region}"
+    ).interactive()
+    st.altair_chart(monthly_chart, use_container_width=True)
+# Historical Patterns Page
+if page == "Historical Patterns":
+    st.title("Historical Patterns")
+    region = st.selectbox("Select a Region", sorted(data['region'].unique()))
+    region_data = data[data['region'] == region]
 
+    # Average Price Over Time
+    st.subheader(f"Average Price Over Time in {region}")
+    avg_price = region_data.groupby('Date')['AveragePrice'].mean().reset_index()
+    chart = alt.Chart(avg_price).mark_line().encode(
+        x='Date:T',
+        y='AveragePrice:Q',
+        tooltip=['Date', 'AveragePrice']
+    ).properties(
+        title=f"Price Trends in {region}"
+    ).interactive()
+    st.altair_chart(chart, use_container_width=True)
+
+    # Regional Price Comparison
+    st.subheader("Regional Price Comparison")
+    region_avg = data.groupby('region')['AveragePrice'].mean().sort_values(ascending=False)
+    fig = px.bar(region_avg, x=region_avg.index, y=region_avg.values, 
+                 title="Average Price by Region",
+                 labels={'x': 'Region', 'y': 'Average Price'})
+    st.plotly_chart(fig)
+
+    # Seasonal Trends
+    st.subheader(f"Seasonal Trends in {region}")
+    region_data['Month'] = region_data['Date'].dt.month
+    monthly_avg_price = region_data.groupby('Month')['AveragePrice'].mean().reset_index()
+    monthly_chart = alt.Chart(monthly_avg_price).mark_line(point=True).encode(
+        x=alt.X('Month:O', title='Month'),
+        y=alt.Y('AveragePrice:Q', title='Average Price'),
+        tooltip=['Month', 'AveragePrice']
+    ).properties(
+        title=f"Seasonal Price Trends in {region}"
+    ).interactive()
+    st.altair_chart(monthly_chart, use_container_width=True)
+
+    # Volume vs Price
+    st.subheader(f"Volume vs Price in {region}")
+    scatter_chart = alt.Chart(region_data).mark_circle(size=60, opacity=0.7).encode(
+        x=alt.X('AveragePrice:Q', title='Average Price'),
+        y=alt.Y('TotalVolume:Q', title='Total Volume'),
+        tooltip=['Date', 'AveragePrice', 'TotalVolume'],
+        color=alt.Color('Month:O', title='Month', scale=alt.Scale(scheme='viridis'))
+    ).properties(
+        title=f"Volume vs Price Relationship in {region}"
+    ).interactive()
+    st.altair_chart(scatter_chart, use_container_width=True)
+    
 # Predictive Analysis Page
 if page == "Predictive Analysis":
     st.title("Predictive Analysis")
     features = st.multiselect("Choose features for prediction:", 
-                               ['Total Volume', '4046', '4225', '4770'], 
-                               default=['Total Volume', '4046'])
+                               ['TotalVolume', 'plu4046', 'plu4225', 'plu4770'], 
+                               default=['TotalVolume', 'plu4046'])
     if features:
         X = data[features]
         y = data['AveragePrice']
