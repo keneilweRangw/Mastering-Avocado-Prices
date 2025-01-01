@@ -5,7 +5,12 @@ import plotly.express as px
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import altair as alt
+import pickle
 
+# Load the saved Random Forest model
+with open('best_random_forest_model.pkl', 'rb') as file:
+    best_rf_model = pickle.load(file)
+    
 # Load Data
 @st.cache_data
 def load_data():
@@ -115,26 +120,62 @@ if page == "Historical Patterns":
         title=f"Volume vs Price Relationship in {region}"
     ).interactive()
     st.altair_chart(scatter_chart, use_container_width=True)
-    
-# Predictive Analysis Page
+
+
+
+# Define the Predictive Analysis page
 if page == "Predictive Analysis":
     st.title("Predictive Analysis")
-    features = st.multiselect("Choose features for prediction:", 
-                               ['TotalVolume', 'plu4046', 'plu4225', 'plu4770'], 
-                               default=['TotalVolume', 'plu4046'])
-    if features:
-        X = data[features]
-        y = data['AveragePrice']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        model = LinearRegression().fit(X_train, y_train)
-        predictions = model.predict(X_test)
-        
-        st.write(f"R² Score: {model.score(X_test, y_test):.2f}")
-        st.write("### Predicted vs Actual Prices")
-        fig = px.scatter(x=y_test, y=predictions, labels={"x": "Actual", "y": "Predicted"})
-        fig.add_shape(type='line', x0=min(y_test), y0=min(y_test), x1=max(y_test), y1=max(y_test),
-                      line=dict(color="Red", dash="dash"))
-        st.plotly_chart(fig)
+
+    # User input for feature selection
+    st.subheader("Choose Features for Prediction:")
+    selected_features = st.multiselect("Select features to include:", 
+                                        ['AveragePrice', 'Month', 'Year'])
+
+    if selected_features:
+        st.write(f"You selected: {', '.join(selected_features)}")
+
+        # Allow users to input feature values
+        st.subheader("Input Feature Values:")
+        feature_inputs = {}
+        for feature in selected_features:
+            feature_value = st.number_input(f"Enter value for {feature}:", 
+                                            value=0 if feature != 'Month' else 1,
+                                            step=1)
+            feature_inputs[feature] = feature_value
+
+        # Convert inputs into a DataFrame
+        input_df = pd.DataFrame([feature_inputs])
+
+        # Display the input data
+        st.subheader("Input Data:")
+        st.write(input_df)
+
+        # Make predictions using the loaded model
+        st.subheader("Prediction:")
+        try:
+            prediction = best_rf_model.predict(input_df)[0]
+            st.success(f"Predicted Outcome: {prediction}")
+        except Exception as e:
+            st.error(f"Error in prediction: {e}")
+
+        # Add Prescriptive Insights
+        st.subheader("Prescriptive Model - Recommended Actions:")
+        if 'AveragePrice' in selected_features:
+            if prediction > 1.5:  # Example threshold
+                st.write("**Insight:** High average price predicted. Consider increasing inventory levels to meet potential demand.")
+            else:
+                st.write("**Insight:** Low average price predicted. Optimize inventory to avoid overstocking.")
+
+        # Example: Prescriptive suggestion based on Month
+        if 'Month' in selected_features:
+            if feature_inputs['Month'] in [11, 12]:  # Holiday season
+                st.write("**Insight:** It's the holiday season. Stock up on popular items to meet festive demand.")
+            else:
+                st.write("**Insight:** Regular season. Maintain normal inventory levels.")
+    else:
+        st.warning("Please select at least one feature to proceed.")
+
 
 # Insights Page
 if page == "Insights":
@@ -159,10 +200,11 @@ if page == "About":
     - Data Analysis
     - Machine Learning
     - Interactive Dashboard Development
-    """)
+    
+    **Developed by:** Keneilwe Patricia  
+""")
     st.image("keneilwe.jpg", caption="Keneilwe Patricia", use_column_width=True)
     st.write("""
-    **Developed by:** Keneilwe Patricia  
     **Email:** [patricia001105@gmail.com](mailto:patricia001105@gmail.com)  
     **LinkedIn:** [Keneilwe Rangwaga](https://www.linkedin.com/in/keneilwe-rangwaga14112004)  
     """)
