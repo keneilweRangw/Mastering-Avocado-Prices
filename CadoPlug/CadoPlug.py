@@ -57,7 +57,7 @@ def load_data():
 
 data = load_data()
 
-st.sidebar.image("CadoPlug_logo.jpg", use_column_width=True) 
+st.sidebar.image("logo.jpeg", use_column_width=True) 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
 # Add an image to the sidebar
