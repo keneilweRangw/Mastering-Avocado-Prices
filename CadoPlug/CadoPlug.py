@@ -273,7 +273,7 @@ if page == "Predictive Analysis":
         # Add Prescriptive Insights
         st.subheader("Recommended Actions:")
         if 'AveragePrice' in selected_features:
-            if prediction < 10:  # threshold for high price prediction
+            if prediction > 10:  # threshold for high price prediction
                 st.write("**Insight:** High average price predicted. Consider increasing inventory levels to meet potential demand.")
             else:
                 st.write("**Insight:** Low average price predicted. Optimize inventory to avoid overstocking.")
