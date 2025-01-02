@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import altair as alt
@@ -213,20 +213,42 @@ if page == "Historical Patterns":
 ).interactive()
 
     st.altair_chart(seasonal_chart, use_container_width=True)
-    # Regional Price Comparison
+    import altair as alt
+    import pandas as pd
+
+# Regional Sales Volume Comparison
     st.subheader("Regional Sales Volume Comparison")
-    region_avg = data.groupby('region')['TotalVolume'].mean().sort_values(ascending=False)
-    fig = px.bar(region_avg, x=region_avg.index, y=region_avg.values, 
-                 title="Total Volume by Region",
-                 labels={'x': 'Region', 'y': 'TotalVolume'})
-    st.plotly_chart(fig)
-    # Regional Price Comparison
+    region_avg_volume = data.groupby('region')['TotalVolume'].mean().sort_values(ascending=False).reset_index()
+
+# Create the interactive chart for Regional Sales Volume
+    volume_chart = alt.Chart(region_avg_volume).mark_bar(color='skyblue').encode(
+    x=alt.X('region:N', sort='-y'),  # Sort regions by TotalVolume
+    y='TotalVolume:Q',
+    tooltip=['region:N', 'TotalVolume:Q']
+).properties(
+    title="Total Volume by Region",
+    width=800,
+    height=400
+)
+
+    st.altair_chart(volume_chart, use_container_width=True)
+
+# Regional Price Comparison
     st.subheader("Regional Price Comparison")
-    region_avg = data.groupby('region')['AveragePrice'].mean().sort_values(ascending=False)
-    fig = px.bar(region_avg, x=region_avg.index, y=region_avg.values, 
-                 title="Average Price by Region",
-                 labels={'x': 'Region', 'y': 'Average Price'})
-    st.plotly_chart(fig)
+    region_avg_price = data.groupby('region')['AveragePrice'].mean().sort_values(ascending=False).reset_index()
+
+# Create the interactive chart for Regional Price Comparison
+    price_chart = alt.Chart(region_avg_price).mark_bar(color='lightgreen').encode(
+    x=alt.X('region:N', sort='-y'),  # Sort regions by AveragePrice
+    y='AveragePrice:Q',
+    tooltip=['Region:N', 'AveragePrice:Q']
+).properties(
+    title="Average Price by Region",
+    width=800,
+    height=400
+)
+
+    st.altair_chart(price_chart, use_container_width=True)
 
 
 
