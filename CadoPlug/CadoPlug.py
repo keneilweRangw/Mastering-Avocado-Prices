@@ -6,11 +6,48 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import altair as alt
 import pickle
+# Page configuration
+st.set_page_config(
+    page_title="CadoPlug - Avocado Trends",
+    page_icon="🥑"
+)
+
+# Add custom CSS for avocado colors
+st.markdown(
+    """
+    <style>
+    /* Sidebar styling */
+    .sidebar .sidebar-content {
+        background: linear-gradient(to bottom, #b9fbc2, #fff176); /* Light green to yellow gradient */
+    }
+    .sidebar .css-17eq0hr {
+        color: #2e7d32; /* Dark green text for sidebar */
+    }
+
+    /* Main content styling */
+    .main-content {
+        background-color: #fdf3e3; /* Light beige background for main content */
+    }
+
+    /* Header styling */
+    .css-18e3th9 h1, .css-18e3th9 h2, .css-18e3th9 h3 {
+        color: #3e2723; /* Dark brown headers */
+    }
+
+    /* Button and interactive element styling */
+    .css-1q8dd3e, .css-1q8dd3e:hover {
+        background-color: #aed581; /* Light green button background */
+        color: #ffffff; /* White text */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Load the saved Random Forest model
-with open('best_random_forest_model.pkl', 'rb') as file:
+with open('random_forest_model.pkl', 'rb') as file:
     best_rf_model = pickle.load(file)
-    
+
 # Load Data
 @st.cache_data
 def load_data():
@@ -20,74 +57,169 @@ def load_data():
 
 data = load_data()
 
+st.sidebar.image("CadoPlug_ _Stay plugged into premium avo trends._ logo.jpg", use_column_width=True) 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
+# Add an image to the sidebar
 page = st.sidebar.radio("Choose a page:", ["Home", "Historical Patterns", "Predictive Analysis", "Insights", "About"])
 
 # Home Page
 if page == "Home":
     st.title("CadoPlug")
     st.write("""
-    Welcome to CadoPlug! This interactive app explores avocado price trends, predicts future prices, 
-    and provides actionable insights to optimize pricing strategies.
+    Welcome to **CadoPlug**! 🌱 An app designed to plug you with premium `AVO` trends 
     """)
     st.image("logo.jpeg", use_column_width=True)
     st.write("### Data Snapshot")
-    st.dataframe(data.head(10))
+    st.dataframe(data.head(3))
 
+     # User Guide
+    st.header("User Guide")
+    st.markdown("This app serves multiple user groups. Find your profile below to discover insights tailored to your needs:")
+
+    # Dictionary of user groups with descriptions
+    import streamlit as st
+
+# Define user groups and their respective details
+    user_groups = {
+    "Farmers and Producers": """
+    - **Purpose:**
+        - Plan production cycles and optimize pricing strategies.
+    - **How to Use:** 
+        - View price trends and identify high-demand periods on the Historical Trends page.
+    """,
+    "Distributors and Retailers": """
+    - **Purpose:**
+        - Manage inventory and identify regional demand.
+    - **How to Use:**
+        - Compare prices on the Historical Trends page.
+        - Forecast sales on the Predictive Analysis page.
+        - Get stocking strategies on the Insights page.
+    """,
+    "Consumers": """
+    - **Purpose:**
+        - Plan purchases by identifying affordable times and regions.
+    - **How to Use:**
+        - Check Historical Trends for low-price periods.
+        - Forecast affordability on the Predictive Analysis page.
+    """,
+    "Policy Makers and Economists": """
+    - **Purpose:**
+        - Analyze market trends and ensure fair trade practices.
+    - **How to Use:**
+        - Study long-term trends on Historical Trends.
+        - Forecast market conditions on Predictive Analysis.
+        - Access strategies on the Insights page.
+    """,
+    "Sustainability Advocates": """
+    - **Purpose:**
+        - Promote sustainable practices and reduce waste.
+    - **How to Use:**
+        - Identify overproduction risks on Historical Trends.
+        - Align production with demand on the Insights page.
+    """,
+    "Business Owners and Decision Makers": """
+    - **Purpose:**
+        - Improve efficiency and profitability using data insights.
+    - **How to Use:**
+        - View past trends on Historical Trends.
+        - Forecast future sales on Predictive Analysis.
+        - Get actionable recommendations on Insights.
+    """
+}
+
+# Display user guide sections with numbering
+    st.title("User Groups Guide")
+    for idx, (group, description) in enumerate(user_groups.items(), start=1):
+     st.write(f"**{idx}. {group}**")  # Adds a number before each group
+     st.markdown(description)
+
+# Getting Started Guide Section
+    st.header("General Navigation")
+    st.markdown("""
+        Follow the steps below to begin exploring.
+        1. Select your **user group** from the list above to understand how the app can serve your needs.
+        2. Navigate to the relevant pages based on your interests:
+          - **Historical Patterns**: View avocado price and sales trends over time and compare prices by region.
+          - **Predictive Analysis**: To forecast future avocado sales
+          - **Insights**: Get actionable insights and recommendations to optimize pricing and sales strategies based on data trends.
+          - **About**: Learn more about the app's purpose, development, and how it can benefit you.
+    """)
+
+    st.write("Now, explore the app and make informed decisions!")
 # Historical Patterns Page
 if page == "Historical Patterns":
     st.title("Historical Patterns")
     region = st.selectbox("Select a Region", sorted(data['region'].unique()))
     region_data = data[data['region'] == region]
 
-    st.subheader(f"Average Price Over Time in {region}")
-    avg_price = region_data.groupby('Date')['AveragePrice'].mean().reset_index()
-    chart = alt.Chart(avg_price).mark_line().encode(
-        x='Date:T',
-        y='AveragePrice:Q',
-        tooltip=['Date', 'AveragePrice']
-    ).properties(
-        title=f"Price Trends in {region}"
-    ).interactive()
+    st.subheader(f"Average Price and Total Volume Over Time in {region}")
+
+# Calculate the average price and total volume over time for the selected region
+    avg_price_volume = region_data.groupby('Date')[['AveragePrice', 'TotalVolume']].mean().reset_index()
+
+# Create Altair chart
+    base = alt.Chart(avg_price_volume).encode(x='Date:T')
+
+# Line chart for Average Price
+    price_line = base.mark_line(color='blue').encode(
+    y=alt.Y('AveragePrice:Q', title='Average Price'),
+    tooltip=['Date', 'AveragePrice']
+)
+
+# Line chart for Total Volume
+    volume_line = base.mark_line(color='orange').encode(
+    y=alt.Y('TotalVolume:Q', title='Total Volume', axis=alt.Axis(titleColor='orange')),
+    tooltip=['Date', 'TotalVolume']
+)
+
+# Combine the two charts
+    chart = alt.layer(price_line, volume_line).resolve_scale(
+    y='independent'  # Use independent scales for the y-axes
+).properties(
+    title=f"Price and Volume Trends in {region}"
+).interactive()
+
     st.altair_chart(chart, use_container_width=True)
 
-    st.subheader("Regional Price Comparison")
-    region_avg = data.groupby('region')['AveragePrice'].mean().sort_values(ascending=False)
-    fig = px.bar(region_avg, x=region_avg.index, y=region_avg.values, 
-                 title="Average Price by Region",
-                 labels={'x': 'Region', 'y': 'Average Price'})
-    st.plotly_chart(fig)
 # Seasonal Trends
     st.subheader(f"Seasonal Trends in {region}")
+# Extract month and calculate monthly averages for AveragePrice and TotalVolume
     region_data['Month'] = region_data['Date'].dt.month
-    monthly_avg_price = region_data.groupby('Month')['AveragePrice'].mean().reset_index()
-    monthly_chart = alt.Chart(monthly_avg_price).mark_line(point=True).encode(
-        x=alt.X('Month:O', title='Month'),
-        y=alt.Y('AveragePrice:Q', title='Average Price'),
-        tooltip=['Month', 'AveragePrice']
-    ).properties(
-        title=f"Seasonal Price Trends in {region}"
-    ).interactive()
-    st.altair_chart(monthly_chart, use_container_width=True)
-# Historical Patterns Page
-if page == "Historical Patterns":
-    st.title("Historical Patterns")
-    region = st.selectbox("Select a Region", sorted(data['region'].unique()))
-    region_data = data[data['region'] == region]
+    monthly_avg = region_data.groupby('Month')[['AveragePrice', 'TotalVolume']].mean().reset_index()
 
-    # Average Price Over Time
-    st.subheader(f"Average Price Over Time in {region}")
-    avg_price = region_data.groupby('Date')['AveragePrice'].mean().reset_index()
-    chart = alt.Chart(avg_price).mark_line().encode(
-        x='Date:T',
-        y='AveragePrice:Q',
-        tooltip=['Date', 'AveragePrice']
-    ).properties(
-        title=f"Price Trends in {region}"
-    ).interactive()
-    st.altair_chart(chart, use_container_width=True)
+# Create Altair chart
+    base = alt.Chart(monthly_avg).encode(
+    x=alt.X('Month:O', title='Month')
+)
 
+# Line chart for Average Price
+    price_line = base.mark_line(point=True, color='blue').encode(
+    y=alt.Y('AveragePrice:Q', title='Average Price'),
+    tooltip=['Month', 'AveragePrice']
+)
+
+# Line chart for Total Volume
+    volume_line = base.mark_line(point=True, color='orange').encode(
+    y=alt.Y('TotalVolume:Q', title='Total Volume', axis=alt.Axis(titleColor='orange')),
+    tooltip=['Month', 'TotalVolume']
+)
+
+# Combine the two charts
+    seasonal_chart = alt.layer(price_line, volume_line).resolve_scale(
+    y='independent'  # Use independent scales for the y-axes
+).properties(
+    title=f"Seasonal Price and Volume Trends in {region}"
+).interactive()
+
+    st.altair_chart(seasonal_chart, use_container_width=True)
+    # Regional Price Comparison
+    st.subheader("Regional Sales Volume Comparison")
+    region_avg = data.groupby('region')['TotalVolume'].mean().sort_values(ascending=False)
+    fig = px.bar(region_avg, x=region_avg.index, y=region_avg.values, 
+                 title="Total Volume by Region",
+                 labels={'x': 'Region', 'y': 'TotalVolume'})
+    st.plotly_chart(fig)
     # Regional Price Comparison
     st.subheader("Regional Price Comparison")
     region_avg = data.groupby('region')['AveragePrice'].mean().sort_values(ascending=False)
@@ -95,31 +227,6 @@ if page == "Historical Patterns":
                  title="Average Price by Region",
                  labels={'x': 'Region', 'y': 'Average Price'})
     st.plotly_chart(fig)
-
-    # Seasonal Trends
-    st.subheader(f"Seasonal Trends in {region}")
-    region_data['Month'] = region_data['Date'].dt.month
-    monthly_avg_price = region_data.groupby('Month')['AveragePrice'].mean().reset_index()
-    monthly_chart = alt.Chart(monthly_avg_price).mark_line(point=True).encode(
-        x=alt.X('Month:O', title='Month'),
-        y=alt.Y('AveragePrice:Q', title='Average Price'),
-        tooltip=['Month', 'AveragePrice']
-    ).properties(
-        title=f"Seasonal Price Trends in {region}"
-    ).interactive()
-    st.altair_chart(monthly_chart, use_container_width=True)
-
-    # Volume vs Price
-    st.subheader(f"Volume vs Price in {region}")
-    scatter_chart = alt.Chart(region_data).mark_circle(size=60, opacity=0.7).encode(
-        x=alt.X('AveragePrice:Q', title='Average Price'),
-        y=alt.Y('TotalVolume:Q', title='Total Volume'),
-        tooltip=['Date', 'AveragePrice', 'TotalVolume'],
-        color=alt.Color('Month:O', title='Month', scale=alt.Scale(scheme='viridis'))
-    ).properties(
-        title=f"Volume vs Price Relationship in {region}"
-    ).interactive()
-    st.altair_chart(scatter_chart, use_container_width=True)
 
 
 
@@ -135,13 +242,28 @@ if page == "Predictive Analysis":
     if selected_features:
         st.write(f"You selected: {', '.join(selected_features)}")
 
-        # Allow users to input feature values
+        # Allow users to input feature values with limits
         st.subheader("Input Feature Values:")
         feature_inputs = {}
         for feature in selected_features:
-            feature_value = st.number_input(f"Enter value for {feature}:", 
-                                            value=0 if feature != 'Month' else 1,
-                                            step=1)
+            if feature == 'AveragePrice':
+                feature_value = st.number_input(f"Enter value for {feature}:", 
+                                                value=0.5,  # Default value
+                                                min_value=0.0,  # Min limit
+                                                max_value=10.0,  # Max limit
+                                                step=0.1)  # Step size
+            elif feature == 'Month':
+                feature_value = st.number_input(f"Enter value for {feature}:", 
+                                                value=1,  # Default value
+                                                min_value=1,  # Min value (January)
+                                                max_value=12,  # Max value (December)
+                                                step=1)  # Step size
+            elif feature == 'Year':
+                feature_value = st.number_input(f"Enter value for {feature}:", 
+                                                value=2023,  # Default value
+                                                min_value=2015,  # Min value (start year)
+                                                max_value=2025,  # Max value (current or near future)
+                                                step=1)  # Step size
             feature_inputs[feature] = feature_value
 
         # Convert inputs into a DataFrame
@@ -152,7 +274,7 @@ if page == "Predictive Analysis":
         st.write(input_df)
 
         # Make predictions using the loaded model
-        st.subheader("Prediction:")
+        st.subheader("Sales Prediction:")
         try:
             prediction = best_rf_model.predict(input_df)[0]
             st.success(f"Predicted Outcome: {prediction}")
@@ -160,14 +282,14 @@ if page == "Predictive Analysis":
             st.error(f"Error in prediction: {e}")
 
         # Add Prescriptive Insights
-        st.subheader("Prescriptive Model - Recommended Actions:")
+        st.subheader("Recommended Actions:")
         if 'AveragePrice' in selected_features:
-            if prediction > 1.5:  # Example threshold
+            if prediction < 10:  # threshold for high price prediction
                 st.write("**Insight:** High average price predicted. Consider increasing inventory levels to meet potential demand.")
             else:
                 st.write("**Insight:** Low average price predicted. Optimize inventory to avoid overstocking.")
 
-        # Example: Prescriptive suggestion based on Month
+        # Prescriptive suggestion based on Month
         if 'Month' in selected_features:
             if feature_inputs['Month'] in [11, 12]:  # Holiday season
                 st.write("**Insight:** It's the holiday season. Stock up on popular items to meet festive demand.")
@@ -196,15 +318,13 @@ if page == "Insights":
 if page == "About":
     st.title("About This App")
     st.write("""
-    This app was developed as part of the Mastering Avocado Pricing project. It showcases my skills in:
-    - Data Analysis
-    - Machine Learning
-    - Interactive Dashboard Development
+    This app was developed as part of the Mastering Avocado Pricing project. It explores avocado price trends, predicts future prices, and provides actionable insights to optimize pricing strategies.
     
-    **Developed by:** Keneilwe Patricia  
+    **Developed by:** Keneilwe Patricia Rangwaga  
 """)
-    st.image("keneilwe.jpg", caption="Keneilwe Patricia", use_column_width=True)
+    st.image("keneilwe.jpg", caption="Keneilwe",  width=200)
     st.write("""
     **Email:** [patricia001105@gmail.com](mailto:patricia001105@gmail.com)  
-    **LinkedIn:** [Keneilwe Rangwaga](https://www.linkedin.com/in/keneilwe-rangwaga14112004)  
+    **LinkedIn:** [Keneilwe Rangwaga](https://www.linkedin.com/in/keneilwe-rangwaga14112004)
+    **Portfolio:** [Here](https://keneilwerangw.github.io/My_Portfolio/home.html)
     """)
