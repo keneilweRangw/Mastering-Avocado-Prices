@@ -97,7 +97,6 @@ if page == "Home":
 }
 
 # Display user guide sections with numbering
-    st.title("User Groups Guide")
     for idx, (group, description) in enumerate(user_groups.items(), start=1):
      st.write(f"**{idx}. {group}**")  # Adds a number before each group
      st.markdown(description)
