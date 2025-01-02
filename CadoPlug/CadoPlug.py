@@ -218,8 +218,6 @@ if page == "Historical Patterns":
 
     st.altair_chart(price_chart, use_container_width=True)
 
-
-
 # Define the Predictive Analysis page
 if page == "Predictive Analysis":
     st.title("Predictive Analysis")
@@ -266,6 +264,7 @@ if page == "Predictive Analysis":
         # Make predictions using the loaded model
         st.subheader("Sales Prediction:")
         try:
+            # Ensure input_df matches the format expected by the model
             prediction = best_rf_model.predict(input_df)[0]
             st.success(f"Predicted Outcome: {prediction}")
         except Exception as e:
