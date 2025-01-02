@@ -12,38 +12,6 @@ st.set_page_config(
     page_icon="🥑"
 )
 
-# Add custom CSS for avocado colors
-st.markdown(
-    """
-    <style>
-    /* Sidebar styling */
-    .sidebar .sidebar-content {
-        background: linear-gradient(to bottom, #b9fbc2, #fff176); /* Light green to yellow gradient */
-    }
-    .sidebar .css-17eq0hr {
-        color: #2e7d32; /* Dark green text for sidebar */
-    }
-
-    /* Main content styling */
-    .main-content {
-        background-color: #fdf3e3; /* Light beige background for main content */
-    }
-
-    /* Header styling */
-    .css-18e3th9 h1, .css-18e3th9 h2, .css-18e3th9 h3 {
-        color: #3e2723; /* Dark brown headers */
-    }
-
-    /* Button and interactive element styling */
-    .css-1q8dd3e, .css-1q8dd3e:hover {
-        background-color: #aed581; /* Light green button background */
-        color: #ffffff; /* White text */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 # Load the saved Random Forest model
 with open('random_forest_model.pkl', 'rb') as file:
     best_rf_model = pickle.load(file)
@@ -57,6 +25,7 @@ def load_data():
 
 data = load_data()
 
+st.sidebar.image("CadoPlug_logo.jpg", use_column_width=True) 
 # Sidebar Navigation
 st.sidebar.title("Navigation")
 # Add an image to the sidebar
